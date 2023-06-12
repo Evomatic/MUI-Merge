@@ -1,0 +1,29 @@
+name: "Push Branch"
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  push-to-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install
+        run: npm install
+
+      - name: Push to UXPin branch
+        run: npx uxpin-merge push --token $UXPIN_MERGE_TOKEN --branch ${GITHUB_REF##*/}
+        env:
+          UXPIN_MERGE_TOKEN: ${{ secrets.UXPIN_MERGE_TOKEN }}

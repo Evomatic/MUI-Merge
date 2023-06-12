@@ -1,0 +1,27 @@
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  delete-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install
+        run: npm install
+
+      - name: Delete merged branch
+        run: npx uxpin-merge delete-version --token $UXPIN_MERGE_TOKEN --branch ${{ github.event.pull_request.head.ref }}
+        env:
+          UXPIN_MERGE_TOKEN: ${{ secrets.UXPIN_MERGE_TOKEN }}
